@@ -1080,6 +1080,37 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 7960830357740165248, guid: b881671a2a435a042a696a703e330198, type: 3}
   m_PrefabInstance: {fileID: 4652901201021472390}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1160389645
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1160389646}
+  m_Layer: 0
+  m_Name: BabySpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1160389646
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1160389645}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 25.85, y: 0.567, z: 26.32}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1181691240
 GameObject:
   m_ObjectHideFlags: 0
@@ -1781,6 +1812,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3105557138009731111, guid: b8fd529d25826a444ab7592b9f919582, type: 3}
   m_PrefabInstance: {fileID: 4817317130433939392}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &3049154232821770085 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6857112903715317392, guid: b8fd529d25826a444ab7592b9f919582, type: 3}
+  m_PrefabInstance: {fileID: 4817317130433939392}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e855a129c0767d45b5db1626b49ba14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &3147175446560232357
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2068,6 +2110,22 @@ PrefabInstance:
     - target: {fileID: 3105557138009731111, guid: b8fd529d25826a444ab7592b9f919582, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3673555522242237595, guid: b8fd529d25826a444ab7592b9f919582, type: 3}
+      propertyPath: m_NavMeshData
+      value: 
+      objectReference: {fileID: 23800000, guid: 4f81db8ea4f0c974f9f6eb54c81e0537, type: 2}
+    - target: {fileID: 6551695589875623878, guid: b8fd529d25826a444ab7592b9f919582, type: 3}
+      propertyPath: breedingRoom
+      value: 
+      objectReference: {fileID: 3049154232821770085}
+    - target: {fileID: 6551695589875623878, guid: b8fd529d25826a444ab7592b9f919582, type: 3}
+      propertyPath: babySpawnPoint
+      value: 
+      objectReference: {fileID: 1160389646}
+    - target: {fileID: 6857112903715317392, guid: b8fd529d25826a444ab7592b9f919582, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2416,3 +2474,4 @@ SceneRoots:
   - {fileID: 1747185426}
   - {fileID: 1338224551}
   - {fileID: 206003526}
+  - {fileID: 1160389646}
