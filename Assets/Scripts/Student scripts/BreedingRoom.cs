@@ -1,13 +1,23 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
 public class BreedingRoom : Room
 {
     [SerializeField] private BreedingSystem breedingSystem;
-    [SerializeField] private CreatureSpawner creatureSpawner;
     [SerializeField] private float breedingTime = 10f;
+    [SerializeField] private float breedingCooldown = 5f;
 
     private bool isBreeding = false;
+    private bool isOnCooldown = false;
+
+    // FA2 UPGRADE: Observer pattern via C# event.
+    // BreedingRoom no longer needs to know CreatureSpawner
+    // exists. It simply announces "a baby is ready" and anyone
+    // subscribed (CreatureSpawner) responds. This replaces the
+    // FA1 approach of holding a direct serialized reference to
+    // CreatureSpawner and calling it manually.
+    public event Action<BreedingData, Transform> OnBabyReady;
 
     public override void Start()
     {
@@ -23,13 +33,17 @@ public class BreedingRoom : Room
     {
         int creatureCount = GetRoomCount();
 
-        // Not enough creatures
+        // FA2 FEATURE: Cooldown prevents instant repeat breeding
+        if (isOnCooldown)
+        {
+            return;
+        }
+
         if (creatureCount < 2)
         {
             return;
         }
 
-        // Too many creatures
         if (creatureCount > 2)
         {
             UIManager.Instance.DisplayWarningMessage(
@@ -40,7 +54,6 @@ public class BreedingRoom : Room
             return;
         }
 
-        // Exactly 2 creatures and not already breeding
         if (creatureCount == 2 && !isBreeding)
         {
             StartCoroutine(BreedingCountdown());
@@ -56,7 +69,6 @@ public class BreedingRoom : Room
 
         yield return new WaitForSeconds(breedingTime);
 
-        // Check creatures are still in the room after waiting
         if (GetRoomCount() != 2)
         {
             Debug.Log("Breeding cancelled. Creature count changed.");
@@ -65,7 +77,6 @@ public class BreedingRoom : Room
             yield break;
         }
 
-        // Get the two parents
         Creature parentA = children[0].GetComponent<Creature>();
         Creature parentB = children[1].GetComponent<Creature>();
 
@@ -76,7 +87,6 @@ public class BreedingRoom : Room
             yield break;
         }
 
-        // Run the breeding logic and log the result
         BreedingData babyData = breedingSystem.Breed(parentA, parentB);
 
         Debug.Log("Breeding calculation complete.");
@@ -84,19 +94,24 @@ public class BreedingRoom : Room
         Debug.Log($"Baby scale will be: {babyData.babyScale}");
         Debug.Log($"Mutation occurred: {babyData.mutationOccurred}");
 
-        // Pass to spawner — spawner implementation in progress
-        if (creatureSpawner != null)
-        {
-            creatureSpawner.SpawnBaby(babyData, this.transform);
-        }
-        else
-        {
-            Debug.LogWarning("BreedingRoom: CreatureSpawner not yet assigned.");
-        }
+        // Announce the baby is ready. CreatureSpawner is
+        // listening and will handle the actual instantiation.
+        OnBabyReady?.Invoke(babyData, this.transform);
 
-        UIManager.Instance.DisplayWarningMessage("Breeding complete! Spawning coming soon.");
+        UIManager.Instance.DisplayWarningMessage("A new creature has been born!");
 
         isBreeding = false;
+
+        StartCoroutine(CooldownRoutine());
+    }
+
+    private IEnumerator CooldownRoutine()
+    {
+        isOnCooldown = true;
+        Debug.Log($"Breeding room on cooldown for {breedingCooldown} seconds.");
+        yield return new WaitForSeconds(breedingCooldown);
+        isOnCooldown = false;
+        Debug.Log("Breeding room cooldown complete. Ready to breed again.");
     }
 
     public override string ToString()
@@ -104,6 +119,11 @@ public class BreedingRoom : Room
         if (isBreeding)
         {
             return "Breeding in progress...";
+        }
+
+        if (isOnCooldown)
+        {
+            return "Breeding room is on cooldown.";
         }
 
         return "Place exactly 2 creatures here to breed them.";
