@@ -12,19 +12,24 @@ public class BreedingSystem : MonoBehaviour
         BreedingData result = new BreedingData();
 
         // ── Stat Inheritance ──────────────────────────────────
+        // FA2 FIX: Previously matched stats by list index, which
+        // assumed both parents stored stats in identical order.
+        // Now matches by stat NAME instead, which is safe even
+        // if two different creature types order their stats
+        // differently in the Inspector.
         List<Stat> parentAStats = parentA.GetStats();
         List<Stat> parentBStats = parentB.GetStats();
 
-        for (int i = 0; i < parentAStats.Count; i++)
+        foreach (Stat statA in parentAStats)
         {
-            Stat inheritedStat = (Random.value < 0.5f)
-                ? parentAStats[i]
-                : parentBStats[i];
+            string statName = statA.GetTrait().Name;
+            Stat statB = parentBStats.Find(s => s.GetTrait().Name == statName);
 
-            string statName = inheritedStat.GetTrait().Name;
-            float statValue = inheritedStat.GetTrait().Value;
+            Stat inheritedStat = (statB != null && Random.value < 0.5f)
+                ? statB
+                : statA;
 
-            result.statValues[statName] = statValue;
+            result.statValues[statName] = inheritedStat.GetTrait().Value;
         }
 
         // ── Mutation ──────────────────────────────────────────
@@ -55,12 +60,7 @@ public class BreedingSystem : MonoBehaviour
 
             if (result.mutationOccurred)
             {
-                result.babyColour = new Color(
-                    Random.value,
-                    Random.value,
-                    Random.value,
-                    1f
-                );
+                result.babyColour = new Color(Random.value, Random.value, Random.value, 1f);
             }
         }
 
