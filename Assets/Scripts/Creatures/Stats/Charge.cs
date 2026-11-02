@@ -8,10 +8,14 @@ public class Charge : Stat, ITick
     [SerializeField] private float warningThreshold;
     private bool delayDamage;
     private bool delayWarning;
-    
+
     public Charge(Trait trait) : base(trait)
     {
-        
+    }
+
+    public Charge()
+    {
+        // Required for Unity's AddComponent to work at runtime.
     }
 
     public void Tick()
@@ -60,5 +64,16 @@ public class Charge : Stat, ITick
         yield return new WaitForSeconds(5);
         delayDamage = false;
         GetComponent<Health>().Damage();
+    }
+
+    public override void CopyFrom(Stat source)
+    {
+        base.CopyFrom(source);
+
+        if (source is Charge chargeSource)
+        {
+            tickRate = chargeSource.tickRate;
+            warningThreshold = chargeSource.warningThreshold;
+        }
     }
 }

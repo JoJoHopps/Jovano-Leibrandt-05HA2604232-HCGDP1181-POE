@@ -7,11 +7,15 @@ public class Happiness : Stat, ITick
     [SerializeField] private float tickRate;
     [SerializeField] private float warningThreshold;
     private bool delayWarning;
-    
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
     public Happiness(Trait trait) : base(trait)
     {
-        
+
+    }
+
+    public Happiness()
+    {
+        // Required for Unity's AddComponent to work at runtime.
     }
 
     public void Tick()
@@ -48,5 +52,16 @@ public class Happiness : Stat, ITick
     {
         yield return new WaitForSeconds(3);
         delayWarning = false;
+    }
+
+    public override void CopyFrom(Stat source)
+    {
+        base.CopyFrom(source);
+
+        if (source is Happiness happinessSource)
+        {
+            tickRate = happinessSource.tickRate;
+            warningThreshold = happinessSource.warningThreshold;
+        }
     }
 }

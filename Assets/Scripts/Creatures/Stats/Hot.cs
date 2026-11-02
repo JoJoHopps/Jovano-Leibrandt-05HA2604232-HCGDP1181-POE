@@ -8,10 +8,14 @@ public class Hot : Stat, ITick
     [SerializeField] private float warningThreshold;
     private bool delayDamage;
     private bool delayWarning;
-    
+
     public Hot(Trait trait) : base(trait)
     {
-        
+    }
+
+    public Hot()
+    {
+        // Required for Unity's AddComponent to work at runtime.
     }
 
     public void Tick()
@@ -60,5 +64,16 @@ public class Hot : Stat, ITick
         yield return new WaitForSeconds(5);
         delayDamage = false;
         GetComponent<Health>().Damage();
+    }
+
+    public override void CopyFrom(Stat source)
+    {
+        base.CopyFrom(source);
+
+        if (source is Hot hotSource)
+        {
+            tickRate = hotSource.tickRate;
+            warningThreshold = hotSource.warningThreshold;
+        }
     }
 }

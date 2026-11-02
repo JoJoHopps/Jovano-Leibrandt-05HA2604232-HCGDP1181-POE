@@ -9,10 +9,14 @@ public class Waste : Stat, ITick
     [SerializeField] private GameObject wastePrefab;
     private bool delayWarning;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     public Waste(Trait trait) : base(trait)
     {
-        
+
+    }
+
+    public Waste()
+    {
+        // Required for Unity's AddComponent to work at runtime.
     }
 
     public void Tick()
@@ -49,5 +53,17 @@ public class Waste : Stat, ITick
     {
         yield return new WaitForSeconds(3);
         delayWarning = !delayWarning;
+    }
+
+    public override void CopyFrom(Stat source)
+    {
+        base.CopyFrom(source);
+
+        if (source is Waste wasteSource)
+        {
+            tickRate = wasteSource.tickRate;
+            warningThreshold = wasteSource.warningThreshold;
+            wastePrefab = wasteSource.wastePrefab;
+        }
     }
 }

@@ -9,9 +9,14 @@ public class Hunger : Stat, ITick
     [SerializeField] private float warningThreshold;
     private bool delayDamage;
     private bool delayWarning;
-    
+
     public Hunger(Trait trait) : base(trait)
     {
+    }
+
+    public Hunger()
+    {
+        // Required for Unity's AddComponent to work at runtime.
     }
 
     public void Tick()
@@ -60,5 +65,16 @@ public class Hunger : Stat, ITick
         yield return new WaitForSeconds(5);
         delayDamage = false;
         GetComponent<Health>().Damage();
+    }
+
+    public override void CopyFrom(Stat source)
+    {
+        base.CopyFrom(source);
+
+        if (source is Hunger hungerSource)
+        {
+            tickRate = hungerSource.tickRate;
+            warningThreshold = hungerSource.warningThreshold;
+        }
     }
 }

@@ -2071,6 +2071,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Breeding Room
       objectReference: {fileID: 0}
+    - target: {fileID: 1196250892656851421, guid: b8fd529d25826a444ab7592b9f919582, type: 3}
+      propertyPath: mutationChance
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1196250892656851421, guid: b8fd529d25826a444ab7592b9f919582, type: 3}
+      propertyPath: mutationColourShift
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 3105557138009731111, guid: b8fd529d25826a444ab7592b9f919582, type: 3}
       propertyPath: m_LocalPosition.x
       value: 26.046755

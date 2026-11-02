@@ -4,11 +4,15 @@ using UnityEngine;
 public class Health : Stat
 {
     private bool delay = false;
-    
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
     public Health(Trait trait) : base(trait)
     {
-        
+
+    }
+
+    public Health()
+    {
+        // Required for Unity's AddComponent to work at runtime.
     }
 
     public void Heal()
@@ -33,19 +37,19 @@ public class Health : Stat
 
     public void Die()
     {
-        Destroy(gameObject,5);
+        Destroy(gameObject, 5);
     }
 
     public IEnumerator HealHealth()
     {
         delay = true;
         yield return new WaitForSeconds(2f);
-         trait.Value++;
-         if (trait.Value > trait.MaxValue)
-         {
-             trait.Value = trait.MaxValue;
-         }
-         delay = false;
+        trait.Value++;
+        if (trait.Value > trait.MaxValue)
+        {
+            trait.Value = trait.MaxValue;
+        }
+        delay = false;
     }
 
 }

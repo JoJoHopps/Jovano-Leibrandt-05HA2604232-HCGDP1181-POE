@@ -10,13 +10,9 @@ public class BreedingRoom : Room
 
     private bool isBreeding = false;
     private bool isOnCooldown = false;
+    private bool overcrowdWarningShown = false;
+    private float timeRemaining = 0f;
 
-    // FA2 UPGRADE: Observer pattern via C# event.
-    // BreedingRoom no longer needs to know CreatureSpawner
-    // exists. It simply announces "a baby is ready" and anyone
-    // subscribed (CreatureSpawner) responds. This replaces the
-    // FA1 approach of holding a direct serialized reference to
-    // CreatureSpawner and calling it manually.
     public event Action<BreedingData, Transform> OnBabyReady;
 
     public override void Start()
@@ -33,7 +29,12 @@ public class BreedingRoom : Room
     {
         int creatureCount = GetRoomCount();
 
-        // FA2 FEATURE: Cooldown prevents instant repeat breeding
+        // Allow the overcrowding warning to appear again next time it happens.
+        if (creatureCount <= 2)
+        {
+            overcrowdWarningShown = false;
+        }
+
         if (isOnCooldown)
         {
             return;
@@ -46,11 +47,15 @@ public class BreedingRoom : Room
 
         if (creatureCount > 2)
         {
-            UIManager.Instance.DisplayWarningMessage(
-                "Too many creatures in the breeding room! Remove "
-                + (creatureCount - 2)
-                + " creature(s)."
-            );
+            if (!overcrowdWarningShown)
+            {
+                UIManager.Instance.DisplayWarningMessage(
+                    "Too many creatures in the breeding room! Remove "
+                    + (creatureCount - 2)
+                    + " creature(s)."
+                );
+                overcrowdWarningShown = true;
+            }
             return;
         }
 
@@ -67,7 +72,7 @@ public class BreedingRoom : Room
         Debug.Log("Breeding started. Please wait...");
         UIManager.Instance.DisplayWarningMessage("Breeding in progress...");
 
-        yield return new WaitForSeconds(breedingTime);
+        yield return StartCoroutine(RunTimer(breedingTime));
 
         if (GetRoomCount() != 2)
         {
@@ -94,8 +99,6 @@ public class BreedingRoom : Room
         Debug.Log($"Baby scale will be: {babyData.babyScale}");
         Debug.Log($"Mutation occurred: {babyData.mutationOccurred}");
 
-        // Announce the baby is ready. CreatureSpawner is
-        // listening and will handle the actual instantiation.
         OnBabyReady?.Invoke(babyData, this.transform);
 
         UIManager.Instance.DisplayWarningMessage("A new creature has been born!");
@@ -109,21 +112,45 @@ public class BreedingRoom : Room
     {
         isOnCooldown = true;
         Debug.Log($"Breeding room on cooldown for {breedingCooldown} seconds.");
-        yield return new WaitForSeconds(breedingCooldown);
+
+        yield return StartCoroutine(RunTimer(breedingCooldown));
+
         isOnCooldown = false;
         Debug.Log("Breeding room cooldown complete. Ready to breed again.");
     }
 
+    // Shared by the breeding phase and the cooldown phase. Counts timeRemaining
+    // down to zero so ToString() can show a live countdown in the info panel.
+    private IEnumerator RunTimer(float duration)
+    {
+        timeRemaining = duration;
+
+        while (timeRemaining > 0f)
+        {
+            timeRemaining -= Time.deltaTime;
+            yield return null;
+        }
+
+        timeRemaining = 0f;
+    }
+
     public override string ToString()
     {
+        int creatureCount = GetRoomCount();
+
+        if (creatureCount > 2)
+        {
+            return "Too many creatures! Remove " + (creatureCount - 2) + " to breed.";
+        }
+
         if (isBreeding)
         {
-            return "Breeding in progress...";
+            return "Breeding in progress...\n" + Mathf.CeilToInt(timeRemaining) + "s remaining";
         }
 
         if (isOnCooldown)
         {
-            return "Breeding room is on cooldown.";
+            return "Breeding room is on cooldown.\nReady in " + Mathf.CeilToInt(timeRemaining) + "s";
         }
 
         return "Place exactly 2 creatures here to breed them.";

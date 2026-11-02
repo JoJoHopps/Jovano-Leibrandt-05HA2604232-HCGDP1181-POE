@@ -9,11 +9,15 @@ public class Cold : Stat, ITick
     private bool delayDamage;
     private bool delayWarning;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     public Cold(Trait trait) : base(trait)
     {
     }
-    
+
+    public Cold()
+    {
+        // Required for Unity's AddComponent to work at runtime.
+    }
+
     public void Tick()
     {
         trait.Value -= tickRate * Time.deltaTime;
@@ -60,5 +64,16 @@ public class Cold : Stat, ITick
         yield return new WaitForSeconds(5);
         delayDamage = false;
         GetComponent<Health>().Damage();
+    }
+
+    public override void CopyFrom(Stat source)
+    {
+        base.CopyFrom(source);
+
+        if (source is Cold coldSource)
+        {
+            tickRate = coldSource.tickRate;
+            warningThreshold = coldSource.warningThreshold;
+        }
     }
 }

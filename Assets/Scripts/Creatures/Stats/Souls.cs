@@ -8,9 +8,14 @@ public class Souls : Stat, ITick
     [SerializeField] private float warningThreshold;
     private bool delayDamage;
     private bool delayWarning;
-    
+
     public Souls(Trait trait) : base(trait)
     {
+    }
+
+    public Souls()
+    {
+        // Required for Unity's AddComponent to work at runtime.
     }
 
     public void Tick()
@@ -59,5 +64,16 @@ public class Souls : Stat, ITick
         yield return new WaitForSeconds(5);
         delayDamage = false;
         GetComponent<Health>().Damage();
+    }
+
+    public override void CopyFrom(Stat source)
+    {
+        base.CopyFrom(source);
+
+        if (source is Souls soulsSource)
+        {
+            tickRate = soulsSource.tickRate;
+            warningThreshold = soulsSource.warningThreshold;
+        }
     }
 }

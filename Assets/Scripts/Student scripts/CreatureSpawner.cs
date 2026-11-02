@@ -48,12 +48,6 @@ public class CreatureSpawner : MonoBehaviour
 
         GameObject baby = Instantiate(prefabToSpawn, spawnPosition, Quaternion.identity);
 
-        // FA2 BUG FIX: In FA1 the baby was parented directly to
-        // the BreedingRoom, which caused the room to immediately
-        // detect 3 creatures (2 parents + 1 baby) and incorrectly
-        // trigger the "too many creatures" warning, permanently
-        // blocking further breeding. Spawning the baby at a
-        // separate point outside the room resolves this.
         if (babySpawnPoint != null)
         {
             baby.transform.SetParent(babySpawnPoint.parent);
@@ -75,7 +69,8 @@ public class CreatureSpawner : MonoBehaviour
         Creature babyCreature = baby.GetComponent<Creature>();
         if (babyCreature != null)
         {
-            ApplyStats(babyCreature, babyData.statValues);
+            ApplySharedStats(babyCreature, babyData.sharedStatValues);
+            ApplyUniqueStats(babyCreature, babyData);
         }
         else
         {
@@ -87,9 +82,9 @@ public class CreatureSpawner : MonoBehaviour
                   $"Mutation: {babyData.mutationOccurred}");
     }
 
-    private void ApplyStats(Creature baby, Dictionary<string, float> statValues)
+    private void ApplySharedStats(Creature baby, Dictionary<string, float> sharedStatValues)
     {
-        foreach (KeyValuePair<string, float> entry in statValues)
+        foreach (KeyValuePair<string, float> entry in sharedStatValues)
         {
             string statName = entry.Key;
             float statValue = entry.Value;
@@ -104,6 +99,36 @@ public class CreatureSpawner : MonoBehaviour
             {
                 Debug.LogWarning($"CreatureSpawner: Stat '{statName}' not found on baby.");
             }
+        }
+    }
+
+    private void ApplyUniqueStats(Creature baby, BreedingData babyData)
+    {
+        foreach (Stat sourceStat in babyData.uniqueStatsToAdd)
+        {
+            string statName = sourceStat.GetTrait().Name;
+
+            if (baby.GetStat(statName) != null)
+            {
+                continue; // already present somehow, avoid creating a duplicate
+            }
+
+            System.Type statType = sourceStat.GetType();
+            Component addedComponent = baby.gameObject.AddComponent(statType);
+            Stat newStat = addedComponent as Stat;
+
+            if (newStat != null)
+            {
+                newStat.CopyFrom(sourceStat);
+                baby.RegisterStat(newStat);
+                Debug.Log($"CreatureSpawner: Baby gained unique trait '{statName}'.");
+            }
+        }
+
+        foreach (string statName in babyData.uniqueStatsToRemove)
+        {
+            baby.RemoveStatByName(statName);
+            Debug.Log($"CreatureSpawner: Baby lost unique trait '{statName}'.");
         }
     }
 }

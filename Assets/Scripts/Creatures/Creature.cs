@@ -82,4 +82,23 @@ public class Creature : MonoBehaviour
     {
         return creaturePrefab;
     }
+
+    public void RegisterStat(Stat newStat)
+    {
+        if (!stats.Contains(newStat))
+        {
+            stats.Add(newStat);
+        }
+    }
+
+    public void RemoveStatByName(string statName)
+    {
+        Stat statToRemove = GetStat(statName);
+
+        if (statToRemove != null)
+        {
+            stats.Remove(statToRemove);
+            Destroy(statToRemove);
+        }
+    }
 }
